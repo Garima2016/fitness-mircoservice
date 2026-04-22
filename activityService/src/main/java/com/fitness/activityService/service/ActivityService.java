@@ -17,20 +17,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ActivityService {
     private static final Logger logger = LoggerFactory.getLogger(ActivityService.class);
-
+    @Autowired
     private ActivityRespository activityRespository;
     private final UserValidationService userValidationService;
     private final KafkaTemplate<String,Activity> kafkaTemplate;
 
-    public String getTopicName() {
-        return topicName;
-    }
-
-    public void setTopicName(String topicName) {
-        this.topicName = topicName;
-    }
-
-    @Value("{kafka.topic.name}")
+    @Value("${kafka.topic.name}")
     private String topicName;
     public ActivityResponse trackActivity(ActivityRequest request) {
 
@@ -42,10 +34,13 @@ public class ActivityService {
 
         Activity activity = Activity.builder()
                 .userId(request.getUserId())
-                .type(request.getType()).duration(request.getDuration()).caloriesBurned(request.getCaloriesBurned())
+                .type(request.getType())
+                .duration(request.getDuration())
+                .caloriesBurned(request.getCaloriesBurned())
                 .startTime(request.getStartTime())
                 .additionalMetrics(request.getAdditionalMetrics())
                 .build();
+
         Activity saveActivity = activityRespository.save(activity);
         try {
             kafkaTemplate.send(topicName, saveActivity.getUserId(), saveActivity);
