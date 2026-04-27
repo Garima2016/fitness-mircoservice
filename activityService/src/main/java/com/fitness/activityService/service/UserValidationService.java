@@ -15,7 +15,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 public class UserValidationService {
     private final WebClient userServiceWebClient;
 
-    // ── Call Item Service with Circuit Breaker + Retry ────
+    // ── Call user Service with Circuit Breaker + Retry ────
     @CircuitBreaker(name = "userService", fallbackMethod = "userServiceFallback")
     @Retry(name = "userService")
     @RateLimiter(name = "userService")
